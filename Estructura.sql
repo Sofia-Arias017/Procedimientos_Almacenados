@@ -1,3 +1,4 @@
+-- Active: 1749952638516@@127.0.0.1@3307@Pizzeria
 DROP DATABASE Pizzeria;
 CREATE DATABASE Pizzeria;
 USE Pizzeria;
