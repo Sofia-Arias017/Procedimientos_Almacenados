@@ -113,3 +113,19 @@ CREATE TABLE IF NOT EXISTS ingredientes_extra (
     FOREIGN KEY (detalle_id) REFERENCES detalle_pedido (id),
     FOREIGN KEY (ingrediente_id) REFERENCES ingrediente (id)
 );
+
+CREATE TABLE IF NOT EXISTS pizza (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    precio DECIMAL(10,2) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS pizza_ingrediente (
+    pizza_id INT UNSIGNED NOT NULL,
+    ingrediente_id INT UNSIGNED NOT NULL,
+    PRIMARY KEY (pizza_id, ingrediente_id),
+    FOREIGN KEY (pizza_id) REFERENCES pizza(id),
+    FOREIGN KEY (ingrediente_id) REFERENCES ingrediente(id)
+);
+
+
