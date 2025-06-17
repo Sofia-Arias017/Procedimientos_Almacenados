@@ -42,4 +42,31 @@ DELIMITER ;
 
 CALL ps_add_pizza_con_ingredientes('Pizza Ranchera', 38000, '1,2,3');
 
+--2.`ps_actualizar_precio_pizza` Procedimiento que reciba `p_pizza_id` y `p_nuevo_precio`y actualice el precio.
+--Antes de actualizar, valide con un `IF` que el nuevo precio sea mayor que 0; de lo contrario, lance un `SIGNAL`.
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS ps_actualizar_precio_pizza $$
+
+CREATE PROCEDURE ps_actualizar_precio_pizza (
+    IN p_pizza_id INT,
+    IN p_nuevo_precio DECIMAL(10,2)
+)
+BEGIN
+    IF p_nuevo_precio <= 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El precio debe ser mayor que cero';
+    ELSE
+        UPDATE pizza
+        SET precio = p_nuevo_precio
+        WHERE id = p_pizza_id;
+    END IF;
+END $$
+
+DELIMITER ;
+
+CALL ps_actualizar_precio_pizza(1, 42000);
+
+CALL ps_actualizar_precio_pizza(2, -1000);
 
