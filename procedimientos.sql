@@ -130,3 +130,46 @@ END $$
 DELIMITER ;
 
 CALL ps_generar_pedido(1, 2, 3, 4);
+
+--4.`ps_cancelar_pedido` Recibe `p_pedido_id` y:
+--Marca el pedido como “cancelado” (p. ej. actualiza un campo `estado`),
+--Elimina todas sus líneas de detalle (`DELETE FROM detalle_pedido WHERE pedido_id = …`).
+--Devuelve el número de líneas eliminadas.
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS ps_cancelar_pedido $$
+
+CREATE PROCEDURE ps_cancelar_pedido (
+    IN p_pedido_id INT
+)
+BEGIN
+    DECLARE existe INT;
+    DECLARE v_filas_eliminadas INT;
+
+    SELECT COUNT(*) INTO existe
+    FROM pedido
+    WHERE id = p_pedido_id;
+
+    IF existe > 0 THEN
+        UPDATE pedido
+        SET total = 0
+        WHERE id = p_pedido_id;
+
+        DELETE FROM detalle_pedido
+        WHERE pedido_id = p_pedido_id;
+
+        SET v_filas_eliminadas = ROW_COUNT();
+
+        SELECT 'Pedido cancelado' AS mensaje,
+            v_filas_eliminadas AS lineas_eliminadas;
+    ELSE
+        
+        SELECT 'El pedido no existe' AS mensaje;
+    END IF;
+END $$
+
+DELIMITER ;
+
+CALL ps_cancelar_pedido(1);
+

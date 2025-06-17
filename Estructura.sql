@@ -21,9 +21,11 @@ CREATE TABLE IF NOT EXISTS pedido (
     total DECIMAL(10, 2) NOT NULL,
     cliente_id INT UNSIGNED NOT NULL,
     metodo_pago_id INT UNSIGNED NOT NULL,
+    estado VARCHAR(20) DEFAULT 'activo', 
     FOREIGN KEY (cliente_id) REFERENCES cliente (id),
     FOREIGN KEY (metodo_pago_id) REFERENCES metodo_pago (id)
 );
+
 
 CREATE TABLE IF NOT EXISTS factura (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
