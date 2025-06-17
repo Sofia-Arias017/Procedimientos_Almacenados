@@ -70,3 +70,63 @@ CALL ps_actualizar_precio_pizza(1, 42000);
 
 CALL ps_actualizar_precio_pizza(2, -1000);
 
+--3.`ps_generar_pedido`(usar TRANSACTION) Procedimiento que reciba: 
+--`p_cliente_id`, 
+--una lista de pizzas y cantidades (`p_items`), 
+--`p_metodo_pago_id`. Dentro de una transacción: 
+--Inserta en pedido. 
+--Para cada ítem, inserta en `detalle_pedido` y en `detalle_pedido_pizza`. 
+--Si todo va bien, hace `COMMIT`; si falla, `ROLLBACK` y devuelve un mensaje de error.
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS ps_generar_pedido $$
+CREATE PROCEDURE ps_generar_pedido(
+    IN p_cliente_id INT,
+    IN p_metodo_pago_id INT,
+    IN p_pizza_id INT,
+    IN p_cantidad INT
+)
+BEGIN
+    DECLARE v_pedido_id INT;
+    DECLARE v_detalle_id INT;
+    DECLARE v_precio DECIMAL(10,2);
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+    BEGIN
+        ROLLBACK;
+        SELECT 'Error. Se cancelo el pedido.' AS mensaje;
+    END;
+
+    START TRANSACTION;
+
+    INSERT INTO pedido(fecha_recogida, total, cliente_id, metodo_pago_id)
+    VALUES (NOW(), 0.00, p_cliente_id, p_metodo_pago_id);
+
+    SET v_pedido_id = LAST_INSERT_ID();
+
+    INSERT INTO detalle_pedido(pedido_id, cantidad)
+    VALUES (v_pedido_id, p_cantidad);
+
+    SET v_detalle_id = LAST_INSERT_ID();
+
+    INSERT INTO detalle_pedido_pizza(detalle_id, pizza_id)
+    VALUES (v_detalle_id, p_pizza_id);
+
+    SELECT precio INTO v_precio
+    FROM pizza
+    WHERE id = p_pizza_id;
+
+    UPDATE pedido
+    SET total = v_precio * p_cantidad
+    WHERE id = v_pedido_id;
+
+    COMMIT;
+
+    SELECT 'Pedido realizado exitosamente' AS mensaje, v_pedido_id AS pedido_id;
+
+END $$
+
+DELIMITER ;
+
+CALL ps_generar_pedido(1, 2, 3, 4);
