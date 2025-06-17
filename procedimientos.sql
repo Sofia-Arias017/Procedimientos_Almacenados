@@ -173,3 +173,44 @@ DELIMITER ;
 
 CALL ps_cancelar_pedido(1);
 
+--5.`ps_facturar_pedido` Crea la factura asociada a un pedido dado (`p_pedido_id`). Debe:
+--Calcular el total sumando precios de pizzas × cantidad,
+--Insertar en `factura`.
+--Devolver el `factura_id` generado.
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS ps_facturar_pedido $$
+CREATE PROCEDURE ps_facturar_pedido(IN p_pedido_id INT)
+BEGIN
+    DECLARE total DECIMAL(10,2) DEFAULT 0;
+    DECLARE cliente_id_aux INT;
+    DECLARE factura_id INT;
+
+    SELECT cliente_id INTO cliente_id_aux
+    FROM pedido
+    WHERE id = p_pedido_id;
+
+    SELECT SUM(p.precio * dp.cantidad) INTO total
+    FROM detalle_pedido dp
+    JOIN detalle_pedido_pizza dpp ON dp.id = dpp.detalle_id
+    JOIN pizza p ON dpp.pizza_id = p.id
+    WHERE dp.pedido_id = p_pedido_id;
+
+    IF total IS NULL THEN
+        SET total = 0;
+    END IF;
+
+    INSERT INTO factura (total, fecha, pedido_id, cliente_id)
+    VALUES (total, NOW(), p_pedido_id, cliente_id_aux);
+
+    SET factura_id = LAST_INSERT_ID();
+
+    SELECT factura_id AS id_generado;
+END $$
+
+DELIMITER ;
+
+CALL ps_facturar_pedido(1);
+
+
