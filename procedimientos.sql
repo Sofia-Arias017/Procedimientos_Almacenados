@@ -191,26 +191,29 @@ BEGIN
     FROM pedido
     WHERE id = p_pedido_id;
 
-    SELECT SUM(p.precio * dp.cantidad) INTO total
-    FROM detalle_pedido dp
-    JOIN detalle_pedido_pizza dpp ON dp.id = dpp.detalle_id
-    JOIN pizza p ON dpp.pizza_id = p.id
-    WHERE dp.pedido_id = p_pedido_id;
+    IF cliente_id_aux IS NULL THEN
+        SELECT 'El pedido no existe' AS mensaje;
+    ELSE
+        SELECT SUM(p.precio * dp.cantidad) INTO total
+        FROM detalle_pedido dp
+        JOIN detalle_pedido_pizza dpp ON dp.id = dpp.detalle_id
+        JOIN pizza p ON dpp.pizza_id = p.id
+        WHERE dp.pedido_id = p_pedido_id;
 
-    IF total IS NULL THEN
-        SET total = 0;
+        IF total IS NULL THEN
+            SET total = 0;
+        END IF;
+
+        INSERT INTO factura (total, fecha, pedido_id, cliente_id)
+        VALUES (total, NOW(), p_pedido_id, cliente_id_aux);
+
+        SET factura_id = LAST_INSERT_ID();
+
+        SELECT factura_id AS id_generado;
     END IF;
-
-    INSERT INTO factura (total, fecha, pedido_id, cliente_id)
-    VALUES (total, NOW(), p_pedido_id, cliente_id_aux);
-
-    SET factura_id = LAST_INSERT_ID();
-
-    SELECT factura_id AS id_generado;
 END $$
 
 DELIMITER ;
 
 CALL ps_facturar_pedido(1);
-
 
