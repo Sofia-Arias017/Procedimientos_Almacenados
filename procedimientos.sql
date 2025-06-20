@@ -8,39 +8,23 @@ DROP PROCEDURE IF EXISTS ps_add_pizza_con_ingredientes $$
 
 CREATE PROCEDURE ps_add_pizza_con_ingredientes (
     IN p_nombre_pizza VARCHAR(100),
-    IN p_precio DECIMAL(10,2),
-    IN p_ids_ingredientes TEXT
+    IN p_precio DECIMAL(10,2)
 )
 BEGIN 
     DECLARE nuevo_id_pizza INT;
-    DECLARE id_ingrediente INT;
-    DECLARE posicion_coma INT;
 
     INSERT INTO pizza (nombre, precio)
     VALUES (p_nombre_pizza, p_precio);
 
     SET nuevo_id_pizza = LAST_INSERT_ID();
 
-    WHILE LENGTH(p_ids_ingredientes) > 0 DO
-        SET posicion_coma = LOCATE(',', p_ids_ingredientes);
-
-        IF posicion_coma = 0 THEN
-            SET id_ingrediente = p_ids_ingredientes;
-            SET p_ids_ingredientes = '';
-        ELSE
-            SET id_ingrediente = SUBSTRING(p_ids_ingredientes, 1, posicion_coma - 1);
-            SET p_ids_ingredientes = SUBSTRING(p_ids_ingredientes, posicion_coma + 1);
-        END IF;
-
-        INSERT INTO pizza_ingrediente (pizza_id, ingrediente_id)
-        VALUES (nuevo_id_pizza, id_ingrediente);
-    END WHILE;
+    SELECT CONCAT('Pizza "', p_nombre_pizza, '" con ingrediente ',' agregada con ID ', nuevo_id_pizza) AS mensaje;
 
 END $$
 
 DELIMITER ;
 
-CALL ps_add_pizza_con_ingredientes('Pizza Ranchera', 38000, '1,2,3');
+CALL ps_add_pizza_con_ingredientes('Pizza Ranchera', 38000);
 
 --2.`ps_actualizar_precio_pizza` Procedimiento que reciba `p_pizza_id` y `p_nuevo_precio`y actualice el precio.
 --Antes de actualizar, valide con un `IF` que el nuevo precio sea mayor que 0; de lo contrario, lance un `SIGNAL`.
