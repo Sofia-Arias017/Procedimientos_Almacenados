@@ -63,4 +63,39 @@ DELIMITER ;
 
 SELECT fc_descuento_por_cantidad(6, 12000) AS descuento_aplicado;
 
+--3. `fc_precio_final_pedido`
+--Parámetros: `p_pedido_id INT`
+--Usa `calcular_subtotal_pizza` y `descuento_por_cantidad` para devolver el total a pagar.
+
+DELIMITER $$
+
+DROP FUNCTION IF EXISTS fc_precio_final_pedido $$
+
+CREATE FUNCTION fc_precio_final_pedido(p_pedido_id INT)
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+BEGIN
+    DECLARE total_final DECIMAL(10,2);
+
+    SELECT 
+        SUM(
+            (fc_calcular_subtotal_pizza(dpp.pizza_id) * dp.cantidad)
+            - fc_descuento_por_cantidad(dp.cantidad, fc_calcular_subtotal_pizza(dpp.pizza_id))
+        )
+    INTO total_final
+    FROM detalle_pedido dp
+    JOIN detalle_pedido_pizza dpp ON dp.id = dpp.detalle_id
+    WHERE dp.pedido_id = p_pedido_id;
+
+    RETURN IFNULL(total_final, 0);
+END $$
+
+DELIMITER ;
+
+SELECT fc_precio_final_pedido(1);
+
+
+
+
+
 
