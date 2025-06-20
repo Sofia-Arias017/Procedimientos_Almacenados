@@ -94,8 +94,28 @@ DELIMITER ;
 
 SELECT fc_precio_final_pedido(1);
 
+--4. `fc_obtener_stock_ingrediente`
+--Parámetro: `p_ingrediente_id INT`
+--Retorna el stock disponible del ingrediente.
 
+DELIMITER $$
 
+DROP FUNCTION IF EXISTS fc_obtener_stock_ingrediente $$
 
+CREATE FUNCTION fc_obtener_stock_ingrediente(p_ingrediente_id INT)
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE stock_disponible INT;
 
+    SELECT stock
+    INTO stock_disponible
+    FROM ingrediente
+    WHERE id = p_ingrediente_id;
 
+    RETURN IFNULL(stock_disponible, 0);
+END $$
+
+DELIMITER ;
+
+SELECT fc_obtener_stock_ingrediente(2) AS stock_actual;
