@@ -119,3 +119,31 @@ END $$
 DELIMITER ;
 
 SELECT fc_obtener_stock_ingrediente(2) AS stock_actual;
+
+--5. `fc_es_pizza_popular`
+--Parámetro: `p_pizza_id INT`
+--Retorna `1` si la pizza ha sido pedida más de 50 veces (contando en `detalle_pedido_pizza`), sino `0`.
+
+DELIMITER $$
+
+DROP FUNCTION IF EXISTS fc_es_pizza_popular $$
+
+CREATE FUNCTION fc_es_pizza_popular(p_pizza_id INT)
+RETURNS TINYINT
+DETERMINISTIC
+BEGIN
+    DECLARE total_pedidos INT;
+
+    SELECT COUNT(*) INTO total_pedidos
+    FROM detalle_pedido_pizza
+    WHERE pizza_id = p_pizza_id;
+
+    RETURN IF(total_pedidos > 50, 1, 0);
+END $$
+
+DELIMITER ;
+
+SELECT fc_es_pizza_popular(2);
+
+
+
