@@ -13,6 +13,12 @@ SELECT * FROM ingrediente;
 
 SELECT * FROM ingrediente;
 
+SELECT * FROM auditoria_precios;
+
+SELECT * FROM auditoria_precios;
+
+
+
 
 
 

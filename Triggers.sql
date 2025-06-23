@@ -36,4 +36,23 @@ END $$
 
 DELIMITER ;
 
+--3. `tg_after_update_pizza_precio`
+--`AFTER UPDATE` en pizza
+--Inserta en una tabla `auditoria_precios` la pizza_id, precio antiguo y nuevo, y timestamp.
+
+DELIMITER $$
+
+CREATE TRIGGER tg_after_update_pizza_precio
+AFTER UPDATE ON pizza
+FOR EACH ROW
+BEGIN
+    IF NEW.precio <> OLD.precio THEN
+        INSERT INTO auditoria_precios (pizza_id, precio_anterior, precio_nuevo, fecha_cambio)
+        VALUES (OLD.id, OLD.precio, NEW.precio, NOW());
+    END IF;
+END $$
+
+DELIMITER ;
+
+UPDATE producto_presentacion SET precio = 6000 WHERE producto_id = 1 AND presentacion_id = 1;
 

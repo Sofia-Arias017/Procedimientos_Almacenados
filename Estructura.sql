@@ -138,5 +138,14 @@ CREATE TABLE IF NOT EXISTS detalle_pedido_pizza (
     FOREIGN KEY (pizza_id) REFERENCES pizza(id)
 );
 
+CREATE TABLE auditoria_precios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pizza_id INT,
+    precio_anterior DECIMAL(10,2),
+    precio_nuevo DECIMAL(10,2),
+    fecha_cambio DATETIME
+);
+
+
 
 
