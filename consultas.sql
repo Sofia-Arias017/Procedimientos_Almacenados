@@ -11,6 +11,9 @@ SELECT * FROM ingrediente WHERE id = 2;
 
 SELECT * FROM ingrediente;
 
+SELECT * FROM ingrediente;
+
+
 
 
 

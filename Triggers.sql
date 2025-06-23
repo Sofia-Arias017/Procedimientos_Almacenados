@@ -17,3 +17,23 @@ END $$
 DELIMITER ;
 
 INSERT INTO detalle_pedido (pedido_id, cantidad)VALUES (1, 3);
+
+--2. `tg_after_insert_detalle_pedido_pizza`
+--`AFTER INSERT` en `detalle_pedido_pizza`
+--Disminuye el `stock` correspondiente en `ingrediente` según la receta de la pizza.
+
+DELIMITER $$
+
+CREATE TRIGGER tg_after_insert_detalle_pedido_pizza
+AFTER INSERT ON detalle_pedido_pizza
+FOR EACH ROW
+BEGIN
+    UPDATE ingrediente i
+    JOIN receta r ON r.ingrediente_id = i.id
+    SET i.stock = i.stock - r.cantidad
+    WHERE r.pizza_id = NEW.pizza_id;
+END $$
+
+DELIMITER ;
+
+
