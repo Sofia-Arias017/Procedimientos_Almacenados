@@ -56,3 +56,29 @@ DELIMITER ;
 
 UPDATE producto_presentacion SET precio = 6000 WHERE producto_id = 1 AND presentacion_id = 1;
 
+--4. `tg_before_delete_pizza`
+--`BEFORE DELETE` en `pizza`
+--Impide borrar si la pizza aparece en algún `detalle_pedido_pizza` (lanza `SIGNAL`).
+
+DELIMITER $$
+
+CREATE TRIGGER tg_before_delete_pizza
+BEFORE DELETE ON pizza
+FOR EACH ROW
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM detalle_pedido_pizza
+        WHERE pizza_id = OLD.id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No se puede eliminar la pizza porque está en pedidos';
+    END IF;
+END $$
+
+DELIMITER ;
+
+DELETE FROM pizza WHERE id = 1;
+
+
+
