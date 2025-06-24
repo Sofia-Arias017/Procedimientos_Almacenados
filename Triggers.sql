@@ -115,6 +115,35 @@ DELIMITER ;
 
 UPDATE ingrediente SET nombre = 'Eliminado', stock = 0, precio = 0.00 WHERE id = 1;
 
+--7. `tg_after_update_ingrediente_stock`
+--`AFTER UPDATE` en `ingrediente`
+--Si el stock cae por debajo de 10 unidades, inserta una alerta en `notificacion_stock_bajo`.
+
+DELIMITER $$
+
+CREATE TRIGGER tg_actualizar_ingrediente
+BEFORE UPDATE ON ingrediente
+FOR EACH ROW
+BEGIN
+    IF NEW.nombre != OLD.nombre THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No puedes cambiar el nombre del ingrediente.';
+    END IF;
+    IF NEW.stock < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El stock no puede ser negativo.';
+    END IF;
+    IF NEW.precio < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El precio no puede ser negativo.';
+    END IF;
+END $$
+
+DELIMITER ;
+
+
+UPDATE ingrediente SET stock = 50, precio = 3.99 WHERE nombre = 'queso';
+
 
 
 
