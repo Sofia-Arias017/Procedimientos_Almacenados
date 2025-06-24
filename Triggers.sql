@@ -80,5 +80,24 @@ DELIMITER ;
 
 DELETE FROM pizza WHERE id = 1;
 
+--5. `tg_after_insert_factura`
+--`AFTER INSERT` en `factura`
+--Actualiza el pedido asociado marcándolo como “facturado”.
+
+DELIMITER $$
+
+CREATE TRIGGER tg_actualizar_fecha_factura
+BEFORE UPDATE ON factura
+FOR EACH ROW
+BEGIN
+    SET NEW.fecha = NOW();
+END $$
+
+DELIMITER ;
+
+UPDATE factura SET total = 60000 WHERE id = 1;
+
+
+
 
 
