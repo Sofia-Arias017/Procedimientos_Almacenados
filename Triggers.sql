@@ -97,6 +97,23 @@ DELIMITER ;
 
 UPDATE factura SET total = 60000 WHERE id = 1;
 
+--6. `tg_after_delete_detalle_pedido_pizza`
+--`AFTER DELETE`
+--Restaura el stock de los ingredientes de la pizza eliminada en detalle.
+
+DELIMITER $$
+
+CREATE TRIGGER tg_prevenir_delete_ingrediente
+BEFORE DELETE ON ingrediente
+FOR EACH ROW
+BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'NO puedes eliminar el ingrediente actulizalo para hacer el "borrado"';
+END $$
+
+DELIMITER ;
+
+UPDATE ingrediente SET nombre = 'Eliminado', stock = 0, precio = 0.00 WHERE id = 1;
 
 
 
